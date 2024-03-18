@@ -28,20 +28,21 @@ def lire_alpha_digit(char) :
             output += [out_inter]
     return np.array(output)
 
-def lire_MNIST(num) :
-    mat = loadmat("data/mnist_all.mat")
-    char = 'train' + str(num)
-    data = mat[char]
-
-    # On passe d'un code 8-bit à un code binaire
-    output = []
+def lire_MNIST(nums) :
     seuil = 128
+    mat = loadmat("data/mnist_all.mat")
+    Y = []
+    output = []
+    for num in nums:
+        data = mat[f'train{num}']
+        for ligne in data:
+            ligne_output = [1 if pixel >= seuil else 0 for pixel in ligne]
+            output.append(ligne_output)
+        one_hot = [1 if i == num else 0 for i in nums]
+        Y.extend([one_hot] * len(data))
 
-    for ligne in data :
-        ligne_output = [1 if pixel >= seuil else 0 for pixel in ligne]
-        output.append(ligne_output)
-
-    return np.array(output)
+    return np.array(output), np.array(Y)
+    
 
 def lire_MNIST_v2(num) :
     """

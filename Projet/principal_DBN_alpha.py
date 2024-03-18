@@ -23,12 +23,12 @@ data = lire_alpha_digit(data_sample)
 # display_image(dbn_model.generer_image(nb_gibbs_iteration,nb_image_generate),20,16,save=True)
 
 # Etude de l'influence des différents hyperparamètres
-learning_rates = [0.001,0.01,0.1,0.2,0.3,0.4,0.5]
+learning_rates = [0.1 ,0.2]
 images = []
 
 for learning_rate in learning_rates:
     dbn_model = DBN([p,q,p+10,q+10,p+20,q+20,p+30])
-    _ = dbn_model.train(data, nb_iter,learning_rate, batch_size)
+    _ = dbn_model.train(data,learning_rate, batch_size, nb_iter)
     images.append(dbn_model.generer_image(nb_gibbs_iteration,nb_image_generate))
     
 display_image(images,20,16,save=True)

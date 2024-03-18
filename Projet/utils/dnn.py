@@ -11,15 +11,15 @@ class DNN():
         self.dbn = DBN(couche)
         
     
-    def pretrain_DNN(self, X, n_epochs, learning_rate, batch_size):
+    def pretrain_DNN(self, X, learning_rate, batch_size, nb_iter):
         """
         Args:
             X (np.array): size n*p
-            n_epochs (int): number of epochs
+            nb_iter (int): number of iterations
             learning_rate (float): learning rate
             batch_size (int): batch size
         """
-        self.dbn.train(X, n_epochs, learning_rate, batch_size)
+        self.dbn.train(X, learning_rate, batch_size, nb_iter)
     
     def calcul_softmax(self, X):
         """
@@ -65,14 +65,11 @@ class DNN():
                 dbn_copy = copy.deepcopy(self.dbn)
                 
                 for i in range(self.dbn.n_layers-2, -1, -1):
-                    #dbn_copy.rbms[i].b = dbn_copy.rbms[i].b.reshape(1, -1)
-                    dbn_copy.rbms[i].b -= learning_rate * np.mean(delta, axis=0)#.reshape(1, -1)
+                    dbn_copy.rbms[i].b -= learning_rate * np.mean(delta, axis=0)
                     dbn_copy.rbms[i].W -= learning_rate * np.dot(L[i].T, delta) / tb
                     delta = np.dot(delta, self.dbn.rbms[i].W.T) * L[i] * (1 - L[i])
-                    print(f"Layer {i} finished")
                     
                 self.dbn = dbn_copy
-            print(f"Epoch {epoch} finished")
 
             L, Y_hat = self.entree_sortie_reseau(X_copy)
             loss = -np.mean(Y * np.log(Y_hat))

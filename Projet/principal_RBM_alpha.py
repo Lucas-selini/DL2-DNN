@@ -23,7 +23,7 @@ data = lire_alpha_digit(data_sample)
 # display_image(rbm_model.generer_image(nb_gibbs_iteration,nb_image_generate),20,16,save=True)
 
 # Etude de l'influence des différents hyperparamètres
-learning_rates = [0.001,0.01,0.1,0.2,0.3,0.4,0.5]
+learning_rates = [0.1]
 images = []
 
 for learning_rate in learning_rates:

@@ -1,4 +1,4 @@
-from utils.rbm_copy import RBM
+from utils.rbm import RBM
 import numpy as np
 
 class DBN():
@@ -10,22 +10,22 @@ class DBN():
         self.n_layers = len(couche)
         self.rbms = [RBM(couche[i], couche[i+1]) for i in range(self.n_layers-1)]
 
-    def train(self, X, n_epochs, learning_rate, batch_size,is_DNN = False):
+    def train(self, X, learning_rate, batch_size, nb_iter, is_DNN = False):
         """
         Args:
             X (np.array): size n*p
-            n_epochs (int): number of epochs
+            nb_iter (int): number of iterations
             learning_rate (float): learning rate
             batch_size (int): batch size
         """
         X_copy= X.copy()
         if not is_DNN:
             for i in range(self.n_layers-1):
-                self.rbms[i].train_RBM(X_copy, n_epochs, learning_rate, batch_size)
+                self.rbms[i].train(X_copy, learning_rate, batch_size, nb_iter)
                 X_copy = self.rbms[i].entree_sortie(X_copy)
         else:
             for i in range(self.n_layers-2):
-                self.rbms[i].train_RBM(X_copy, n_epochs, learning_rate, batch_size)
+                self.rbms[i].train(X_copy, learning_rate, batch_size, nb_iter)
                 X_copy = self.rbms[i].entree_sortie(X_copy)
 
     
