@@ -35,7 +35,6 @@ class RBM():
 
     def train(self, X, lr, batch_size, nb_iter):
         """
-        Learning the parameters with Contrastive-Divergence-1 algorithm
         Args:
             X (np.array): size n*p
             lr (float): learning_rate
@@ -59,7 +58,7 @@ class RBM():
                 v_1 = (np.random.rand(tb, self.p) < p_v_h_0) * 1  # size tb*p
                 p_h_v_1 = self.entree_sortie(v_1)
 
-                # Calcul des gradients
+                # Compute gradients
                 grad_a = np.sum(v_0 - v_1, axis=0)  # size p
                 grad_b = np.sum(p_h_v_0 - p_h_v_1, axis=0)  # size q
                 grad_W = v_0.T @ p_h_v_0 - v_1.T @ p_h_v_1  # size p*q
@@ -76,13 +75,20 @@ class RBM():
         return errors
 
     def generer_image(self, nb_iter_gibbs, nb_image):
+        """
+        Args:
+            nb_iter_gibbs (int): number of gibbs iteration
+            nb_image (int): number of images to generate
+        Return:
+            (np.array) array of size nb_image*p
+        """
         p = self.a.size
         q = self.b.size
         generated_images = []
 
-        for image in range(nb_image):
+        for _ in range(nb_image):
             v = (np.random.rand(p) < 0.5) * 1  # visible state
-            for i in range(nb_iter_gibbs):
+            for _ in range(nb_iter_gibbs):
                 h = (np.random.rand(q) < self.entree_sortie(v)) * 1  # hidden state
                 v = (np.random.rand(p) < self.sortie_entree(h)) * 1
 

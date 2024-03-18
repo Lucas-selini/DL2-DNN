@@ -19,7 +19,7 @@ class DNN():
             learning_rate (float): learning rate
             batch_size (int): batch size
         """
-        self.dbn.train_DBN(X, n_epochs, learning_rate, batch_size)
+        self.dbn.train(X, n_epochs, learning_rate, batch_size)
     
     def calcul_softmax(self, X):
         """
