@@ -4,6 +4,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter1d
+import math
 
 
 def lire_alpha_digit(char) :
@@ -119,7 +120,8 @@ def display_image(images,hauteur,largeur,save=False) :
 
     # Afficher les images générées
     rows = 1  # Nombre de lignes dans la grille d'affichage
-    cols = 1  # Nombre de colonnes dans la grille d'affichage
+    cols = nb_images  # Nombre de colonnes dans la grille d'affichage
+    # rows = cols = math.ceil(math.sqrt(nb_images))  # Arrange images in a grid
 
     plt.figure(figsize=(10, 6))
 

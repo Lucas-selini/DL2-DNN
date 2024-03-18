@@ -6,9 +6,9 @@ import time
 
 p = 320
 q = 50
-learning_rate = 0.1
+learning_rate = 0.25
 batch_size = 5
-nb_iter = 100
+nb_iter = 1000
 data_sample = [10] # 10 = A, B = 11, ..., Z = 35
 
 nb_gibbs_iteration = 20
@@ -18,16 +18,14 @@ generated_images = []
 errors = []
 training_time = []
 
-#learning_rate = np.arange(0, 0.51, 0.01).tolist()
+# learning_rates = np.arange(0.45, 0.51, 0.01).tolist()
 #q_list = np.arange(10, 150, 1).tolist()
 #iter_list = np.arange(10,500,10).tolist()
 
 data = lire_alpha_digit(data_sample)
 
 for iter in range(1) :
-
     print(iter)
-
     dbn_model = DBN([p,q,p+10,q+10,p+20,q+20,p+30])
 
     start_time = time.time()
@@ -41,5 +39,3 @@ for iter in range(1) :
     generated_images.append(generated_image)
 
 display_image(generated_images,20,16,save=True)
-#display_error(errors,learning_rate,save=True)
-#display_final_error(errors,iter_list,training_time,save=True)
