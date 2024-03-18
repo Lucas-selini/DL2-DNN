@@ -1,39 +1,42 @@
-import numpy as np
+from utils.dbn import DBN
 import copy
-from dbn import DBN
+import numpy as np
 
 class DNN():
     def __init__(self, couche):
-        """initie la classe DNN
-
+        """
         Args:
-            couche (list): Liste des couches du réseau 
-        """ 
+            couche (list): list of number of neurons for each layer
+        """
         self.dbn = DBN(couche)
         
     
     def train_DNN(self, X, n_epochs, learning_rate, batch_size):
+        """
+        Args:
+            X (np.array): size n*p
+            n_epochs (int): number of epochs
+            learning_rate (float): learning rate
+            batch_size (int): batch size
+        """
         self.dbn.train_DBN(X, n_epochs, learning_rate, batch_size)
     
     def calcul_softmax(self, X):
-        """Calcul de la fonction softmax
-
+        """
         Args:
-            X (np_array): données d'entrée
-
-        Returns:
-            np_array: vecteur de sortie
+            X (np.array): size n*q
+        Return:
+            (np.array) array of size n*q
         """
         return np.exp(X) / np.sum(np.exp(X), axis=1, keepdims=True)
 
     def entree_sortie_reseau(self,X):
-        """Calcul de la sortie du réseau
-
+        """
         Args:
-            X (np_array): données d'entrée
-
-        Returns:
-            np_array: vecteur de sortie
+            X (np.array): size n*p
+        Return:
+            (list) list of size n_layers, each element is an array of size n*q
+            (np.array) array of size n*q
         """
         L = [X]
         for rbm in self.dbn.rbms:
@@ -42,14 +45,13 @@ class DNN():
         return L, self.calcul_softmax(L[-1])
     
     def retropropagation(self, X, Y, learning_rate,n_epochs,batch_size):
-        """Rétropropagation
-
+        """
         Args:
-            X (np_array): données d'entrée
-            Y (np_array): données de sortie
-            learning_rate (float): taux d'apprentissage
-            n_epochs (int): nombre d'epochs
-            batch_size (int): taille des batchs
+            X (np.array): size n*p
+            Y (np.array): size n*q
+            learning_rate (float): learning rate
+            n_epochs (int): number of epochs
+            batch_size (int): batch size
         """
         X_copy= X.copy()
         for epoch in range(n_epochs):
@@ -70,14 +72,12 @@ class DNN():
             print(f"Loss at epoch {epoch} : {loss}")
 
     def test_DNN(self, X, Y):
-        """Test du réseau
-
+        """
         Args:
-            X (np_array): données d'entrée
-            Y (np_array): données de sortie
-
-        Returns:
-            float: taux de réussite
+            X (np.array): size n*p
+            Y (np.array): size n*q
+        Return:
+            (float) accuracy
         """
         _, Y_hat = self.entree_sortie_reseau(X)
         return np.mean(np.argmax(Y_hat, axis=1) == np.argmax(Y, axis=1))

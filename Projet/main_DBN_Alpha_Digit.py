@@ -9,7 +9,7 @@ q = 50
 learning_rate = 0.1
 batch_size = 5
 nb_iter = 100
-data_sample = [10]
+data_sample = [10] # 10 = A, B = 11, ..., Z = 35
 
 nb_gibbs_iteration = 20
 nb_image_generate = 1

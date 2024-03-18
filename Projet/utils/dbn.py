@@ -3,15 +3,21 @@ import numpy as np
 
 class DBN():
     def __init__(self, couche):
-        """initie la classe DBN
-
+        """
         Args:
-            couche (list): Liste des couches du réseau 
+            couche (list): list of number of neurons for each layer
         """
         self.n_layers = len(couche)
         self.rbms = [RBM(couche[i], couche[i+1]) for i in range(self.n_layers-1)]
 
     def train(self, X, n_epochs, learning_rate, batch_size,is_DNN = False):
+        """
+        Args:
+            X (np.array): size n*p
+            n_epochs (int): number of epochs
+            learning_rate (float): learning rate
+            batch_size (int): batch size
+        """
         X_copy= X.copy()
         if not is_DNN:
             for i in range(self.n_layers-1):
@@ -24,14 +30,12 @@ class DBN():
 
     
     def generer_image(self, n_gibbs, n_images):
-        """Génération d'images
-
+        """
         Args:
-            n_iter (int): nombre d'itérations
-            n_images (int): nombre d'images à générer
-
-        Returns:
-            np_array: vecteur d'images générées
+            n_gibbs (int): number of gibbs iteration
+            n_images (int): number of images to generate
+        Return:
+            (np.array) array of size n_images*p
         """
         v = (np.random.rand(n_images, self.rbms[self.n_layers-2].a.shape[0]) < np.random.rand(n_images, self.rbms[self.n_layers-2].a.shape[0]) ).astype(int)
         for j in range(n_gibbs):
