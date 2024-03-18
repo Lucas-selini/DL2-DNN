@@ -41,3 +41,7 @@ display_image([data[500]],28,28,save=True)
 # encoder = OneHotEncoder(sparse=False)
 # y_train = encoder.fit_transform(y_train.to_numpy().reshape(-1, 1))
 # y_test = encoder.fit_transform(y_test.to_numpy().reshape(-1, 1))
+
+# dnn = DNN([784, 200, 100, 100, 10])
+# dnn.train_DNN(X_train[:6000], 300, 0.1, 8)
+# dnn.retropropagation(X_train[1000:2000], y_train[1000:2000], 0.1, 100, 8)
