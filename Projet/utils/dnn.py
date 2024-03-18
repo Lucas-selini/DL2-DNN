@@ -11,7 +11,7 @@ class DNN():
         self.dbn = DBN(couche)
         
     
-    def train_DNN(self, X, n_epochs, learning_rate, batch_size):
+    def pretrain_DNN(self, X, n_epochs, learning_rate, batch_size):
         """
         Args:
             X (np.array): size n*p
