@@ -4,7 +4,9 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter1d
-import math
+from sklearn.datasets import fetch_openml
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.model_selection import train_test_split
 
 
 def lire_alpha_digit(char) :
@@ -41,6 +43,29 @@ def lire_MNIST(num) :
 
     return np.array(output)
 
+def lire_MNIST_v2(num) :
+    """
+    :param num: List of number we want to learn
+    :return: The training and test set
+    """
+    mnist = fetch_openml('mnist_784')
+    data, target = mnist.data, mnist.target
+    # Convert target to integers
+    target = target.astype(int)
+    # Filter the data and target for digits in num
+    mask = np.isin(target, num)
+    
+    X = data[mask]
+    y = target[mask]
+    X_bw = np.where(X > 127, 1, 0)
+    X_train, X_test, y_train, y_test = train_test_split(X_bw, y, test_size=0.2, random_state=42)
+    encoder = OneHotEncoder()
+    y_train = encoder.fit_transform(y_train.to_numpy().reshape(-1, 1))
+    y_test = encoder.fit_transform(y_test.to_numpy().reshape(-1, 1))
+
+    return X_train, X_test, y_train, y_test
+
+
 def display_error(errors,parameters,window_size=5,save=False) :
     """
     :param errors: A matrix of subsequent error during the training
@@ -59,14 +84,14 @@ def display_error(errors,parameters,window_size=5,save=False) :
 
         # Tracer la courbe principale avec légende
         handle, = plt.plot(range(len(errors)), errors, label=f"LR: {parameters[i]}", color=color,
-                           alpha=0.7)  # Ajustement de l'opacité
+                            alpha=0.7)  # Ajustement de l'opacité
         handles.append(handle)
         labels.append(f"LR: {parameters[i]}")
 
         # Calcul de la moyenne mobile (courbe de tendance) sans légende
         smoothed_errors = gaussian_filter1d(errors, sigma=window_size)
         plt.plot(range(len(smoothed_errors)), smoothed_errors, linestyle='--', color=darker_color,
-                 alpha=1.0)  # Ajustement de l'opacité
+                alpha=1.0)  # Ajustement de l'opacité
 
     plt.xlabel('Iterations')
     plt.ylabel('Erreur de reconstruction')

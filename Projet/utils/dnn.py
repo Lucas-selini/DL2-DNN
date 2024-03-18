@@ -54,6 +54,7 @@ class DNN():
             batch_size (int): batch size
         """
         X_copy= X.copy()
+        
         for epoch in range(n_epochs):
             for j in range(0, X_copy.shape[0], batch_size):
                 X_batch = X_copy[j:min(j+batch_size, X_copy.shape[0])]
@@ -61,12 +62,18 @@ class DNN():
                 tb = X_batch.shape[0]
                 L, Y_hat = self.entree_sortie_reseau(X_batch)
                 delta = Y_hat - Y_batch
-                dbm_copy = copy.deepcopy(self.dbn)
+                dbn_copy = copy.deepcopy(self.dbn)
+                
                 for i in range(self.dbn.n_layers-2, -1, -1):
-                    dbm_copy.rbms[i].b -= learning_rate * np.mean(delta, axis=0)
-                    dbm_copy.rbms[i].W -= learning_rate * np.dot(L[i].T, delta) / tb
+                    #dbn_copy.rbms[i].b = dbn_copy.rbms[i].b.reshape(1, -1)
+                    dbn_copy.rbms[i].b -= learning_rate * np.mean(delta, axis=0)#.reshape(1, -1)
+                    dbn_copy.rbms[i].W -= learning_rate * np.dot(L[i].T, delta) / tb
                     delta = np.dot(delta, self.dbn.rbms[i].W.T) * L[i] * (1 - L[i])
-                self.dbn = dbm_copy
+                    print(f"Layer {i} finished")
+                    
+                self.dbn = dbn_copy
+            print(f"Epoch {epoch} finished")
+
             L, Y_hat = self.entree_sortie_reseau(X_copy)
             loss = -np.mean(Y * np.log(Y_hat))
             print(f"Loss at epoch {epoch} : {loss}")
