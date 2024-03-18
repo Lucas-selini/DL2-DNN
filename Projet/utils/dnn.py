@@ -2,7 +2,7 @@ import numpy as np
 import copy
 from dbn import DBN
 
-class DNN :
+class DNN():
     def __init__(self, couche):
         """initie la classe DNN
 

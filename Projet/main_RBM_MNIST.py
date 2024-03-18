@@ -1,9 +1,8 @@
 from utils.rbm import RBM
-from utils.dbn import DBN
-from utils.dnn import DNN
-from utils.utils import*
+# from utils.dbn import DBN
+# from utils.dnn import DNN
+from utils.utils import *
 import time
-
 
 p = 784
 q = 50

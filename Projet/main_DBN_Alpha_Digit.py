@@ -1,5 +1,4 @@
-from utils.rbm import RBM
-# from utils.dbn import DBN
+from utils.dbn import DBN
 # from utils.dnn import DNN
 from utils.utils import *
 import time
@@ -29,16 +28,16 @@ for iter in range(1) :
 
     print(iter)
 
-    rbm_model = RBM(p,q)
+    dbn_model = DBN([p,q,p+10,q+10,p+20,q+20,p+30])
 
     start_time = time.time()
-    training_errors = rbm_model.train(data, learning_rate, batch_size, nb_iter)
+    training_errors = dbn_model.train(data, nb_iter,learning_rate, batch_size)
     end_time = time.time()
 
     errors.append(training_errors)
     training_time.append(end_time-start_time)
 
-    generated_image = rbm_model.generer_image(nb_gibbs_iteration,nb_image_generate)
+    generated_image = dbn_model.generer_image(nb_gibbs_iteration,nb_image_generate)
     generated_images.append(generated_image)
 
 display_image(generated_images,20,16,save=True)

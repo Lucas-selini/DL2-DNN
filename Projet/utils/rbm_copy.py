@@ -33,17 +33,17 @@ class RBM():
         entree = 1 / (1 + np.exp(-(H @ self.W.T + self.a)))
         return entree
 
-    def train(self, X, lr, batch_size, nb_iter):
+    def train_RBM(self, X, n_epochs, lr, batch_size):
         """
         Learning the parameters with Contrastive-Divergence-1 algorithm
         Args:
             X (np.array): size n*p
             lr (float): learning_rate
             batch_size (int): batch_size
-            nb_iter (int): number of iterations
+            n_epochs (int): number of epochs
         """
         errors = []
-        for k in range(nb_iter):
+        for k in range(n_epochs):
             np.random.shuffle(X)
 
             for l in range(0, X.shape[0], batch_size):

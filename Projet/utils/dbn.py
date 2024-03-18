@@ -1,7 +1,7 @@
-from rbm import RBM
+from utils.rbm_copy import RBM
 import numpy as np
 
-class DBN:
+class DBN():
     def __init__(self, couche):
         """initie la classe DBN
 

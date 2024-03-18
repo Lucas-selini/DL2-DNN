@@ -11,7 +11,7 @@ def lire_alpha_digit(char) :
     :param char: List of char we want to learn
     :return: A matrix with in line the data and in column the pixels
     """
-    mat = loadmat("../data/binaryalphadigs.mat")
+    mat = loadmat("data/binaryalphadigs.mat")
     data = mat['dat']
 
     output = []
@@ -26,7 +26,7 @@ def lire_alpha_digit(char) :
     return np.array(output)
 
 def lire_MNIST(num) :
-    mat = loadmat("../data/mnist_all.mat")
+    mat = loadmat("data/mnist_all.mat")
     char = 'train' + str(num)
     data = mat[char]
 
