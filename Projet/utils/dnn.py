@@ -75,13 +75,16 @@ class DNN():
 
             L, Y_hat = self.entree_sortie_reseau(X_copy)
             loss = -np.mean(Y * np.log(Y_hat))
-            print(f"Loss at epoch {epoch} : {loss}")
+            if epoch % 5 == 0:
+                print(f"Loss at epoch {epoch} : {loss}")
             losses.append(loss)
         plt.plot(range(len(losses)),losses)
         plt.xlabel('Epochs')
         plt.ylabel('Loss')
         plt.title('Loss over epochs')
         plt.show()
+        plt.savefig('loss.png')
+        plt.close()
 
     def test_DNN(self, X, Y):
         """
