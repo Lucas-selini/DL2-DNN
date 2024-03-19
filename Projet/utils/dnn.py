@@ -91,5 +91,13 @@ class DNN():
         Return:
             (float) accuracy
         """
+        # Process the input through the network
         _, Y_hat = self.entree_sortie_reseau(X)
-        return np.mean(np.argmax(Y_hat, axis=1) == np.argmax(Y, axis=1))
+
+        # Compare the predicted and actual classes
+        correct_predictions = np.argmax(Y_hat, axis=1) == np.argmax(Y, axis=1)
+
+        # Calculate the accuracy
+        accuracy = np.mean(correct_predictions)
+
+        return accuracy
