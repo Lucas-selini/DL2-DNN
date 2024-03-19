@@ -21,7 +21,7 @@ training_time = []
 data = lire_MNIST(num)
 display_image([data[500]],28,28,save=True)
 
-for iter in range(1) :
+for iter in range(1):
 
     print(iter)
 

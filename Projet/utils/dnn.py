@@ -1,6 +1,7 @@
 from utils.dbn import DBN
 import copy
 import numpy as np
+import matplotlib.pyplot as plt
 
 class DNN():
     def __init__(self, couche):
@@ -54,7 +55,8 @@ class DNN():
             batch_size (int): batch size
         """
         X_copy= X.copy()
-        
+        losses = []
+
         for epoch in range(n_epochs):
             for j in range(0, X_copy.shape[0], batch_size):
                 X_batch = X_copy[j:min(j+batch_size, X_copy.shape[0])]
@@ -74,6 +76,12 @@ class DNN():
             L, Y_hat = self.entree_sortie_reseau(X_copy)
             loss = -np.mean(Y * np.log(Y_hat))
             print(f"Loss at epoch {epoch} : {loss}")
+            losses.append(loss)
+        plt.plot(range(len(losses)),losses)
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.title('Loss over epochs')
+        plt.show()
 
     def test_DNN(self, X, Y):
         """

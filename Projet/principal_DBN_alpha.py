@@ -1,19 +1,19 @@
 from utils.dbn import DBN
 from utils.utils import *
 
+# Chargement des données
+data_sample = [11] # 10 = A, B = 11, ..., Z = 35
+data = lire_alpha_digit(data_sample)
+
 # Paramètres liés au réseau et à l'apprentissage
-p = 320
+p = data.shape[1] # 20*16 = 320
 q = 50
 learning_rate = 0.2
 batch_size = 5
 nb_iter = 100
-data_sample = [10] # 10 = A, B = 11, ..., Z = 35
 
 nb_gibbs_iteration = 20
 nb_image_generate = 1
-
-# Chargement des données
-data = lire_alpha_digit(data_sample)
 
 # # Entrainement du DBN
 # dbn_model = DBN([p,q,p+10,q+10,p+20,q+20,p+30])
