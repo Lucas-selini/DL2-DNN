@@ -6,38 +6,48 @@ import matplotlib.pyplot as plt
 class DNN():
     def __init__(self, couche):
         """
+        Deep Neural Network (DNN) class.
+
         Args:
-            couche (list): list of number of neurons for each layer
+            couche (list): List of number of neurons for each layer.
         """
         self.dbn = DBN(couche)
         
     
     def pretrain_DNN(self, X, learning_rate, batch_size, nb_iter):
         """
+        Pretrains the DNN using the Deep Belief Network (DBN).
+
         Args:
-            X (np.array): size n*p
-            nb_iter (int): number of iterations
-            learning_rate (float): learning rate
-            batch_size (int): batch size
+            X (np.array): Input data of size n*p.
+            learning_rate (float): Learning rate.
+            batch_size (int): Batch size.
+            nb_iter (int): Number of iterations.
         """
         self.dbn.train(X, learning_rate, batch_size, nb_iter)
     
     def calcul_softmax(self, X):
         """
+        Calculates the softmax function for the input array.
+
         Args:
-            X (np.array): size n*q
-        Return:
-            (np.array) array of size n*q
+            X (np.array): Input array of size n*q.
+
+        Returns:
+            (np.array): Array of size n*q.
         """
         return np.exp(X) / np.sum(np.exp(X), axis=1, keepdims=True)
 
     def entree_sortie_reseau(self,X):
         """
+        Performs the forward pass through the network.
+
         Args:
-            X (np.array): size n*p
-        Return:
-            (list) list of size n_layers, each element is an array of size n*q
-            (np.array) array of size n*q
+            X (np.array): Input data of size n*p.
+
+        Returns:
+            (list): List of size n_layers, each element is an array of size n*q.
+            (np.array): Array of size n*q.
         """
         L = [X]
         for rbm in self.dbn.rbms:
@@ -47,12 +57,14 @@ class DNN():
     
     def retropropagation(self, X, Y, learning_rate, n_epochs, batch_size):
         """
+        Performs the backpropagation algorithm to train the DNN.
+
         Args:
-            X (np.array): size n*p, input data
-            Y (np.array): size n*q, target labels
-            learning_rate (float): learning rate
-            n_epochs (int): number of epochs
-            batch_size (int): batch size
+            X (np.array): Input data of size n*p.
+            Y (np.array): Target labels of size n*q.
+            learning_rate (float): Learning rate.
+            n_epochs (int): Number of epochs.
+            batch_size (int): Batch size.
         """
         X_copy = X.copy()
         losses = []
@@ -108,11 +120,14 @@ class DNN():
 
     def test_DNN(self, X, Y):
         """
+        Tests the performance of the DNN on the given data.
+
         Args:
-            X (np.array): size n*p
-            Y (np.array): size n*q
-        Return:
-            (float) accuracy
+            X (np.array): Input data of size n*p.
+            Y (np.array): Target labels of size n*q.
+
+        Returns:
+            (float): Accuracy of the DNN.
         """
         # Process the input through the network
         _, Y_hat = self.entree_sortie_reseau(X)

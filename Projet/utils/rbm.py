@@ -3,6 +3,8 @@ import numpy as np
 class RBM():
     def __init__(self, p, q):
         """
+        Initialize a Restricted Boltzmann Machine (RBM) model.
+
         Args:
             p (int): input size (number of visible variables)
             q (int): output size (number of latent variables)
@@ -15,8 +17,11 @@ class RBM():
 
     def entree_sortie(self, X):
         """
+        Compute the output of the RBM given the input.
+
         Args:
             X (np.array): array of size n*p
+
         Return:
             (np.array) array of size n*q
         """
@@ -25,8 +30,11 @@ class RBM():
 
     def sortie_entree(self, H):
         """
+        Compute the input of the RBM given the output.
+
         Args:
             H (np.array): array of size n*q
+
         Return:
             (np.array) array of size n*p
         """
@@ -35,6 +43,8 @@ class RBM():
 
     def train(self, X, lr, batch_size, nb_iter):
         """
+        Train the RBM model using Contrastive Divergence algorithm.
+
         Args:
             X (np.array): size n*p
             lr (float): learning_rate
@@ -76,9 +86,12 @@ class RBM():
 
     def generer_image(self, nb_iter_gibbs, nb_image):
         """
+        Generate images using the RBM model.
+
         Args:
             nb_iter_gibbs (int): number of gibbs iteration
             nb_image (int): number of images to generate
+
         Return:
             (np.array) array of size nb_image*p
         """

@@ -1,16 +1,29 @@
-import numpy as np
+"""
+This script trains and compares the performance of a Deep Neural Network (DNN) with and without pretraining on the MNIST dataset.
+
+The script performs the following steps:
+1. Loads the MNIST dataset for the specified digit classes.
+2. Splits the dataset into training and testing sets.
+3. Defines the parameters for the DNN and the training process.
+4. Creates a list of hidden layer sizes for the DNN.
+5. Trains a DNN with pretraining for each hidden layer size and records the training and testing accuracies.
+6. Trains a DNN without pretraining for each hidden layer size and records the training and testing accuracies.
+7. Plots the accuracies for comparison.
+"""
+
 from utils.dnn import DNN
 from utils.utils import *
+from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-# import time
-# import copy
 
-# # Chargement des données
-nums = [0,1,2]
+# Load the MNIST dataset for the specified digit classes
+nums = [0, 1, 2]
 X, Y = lire_MNIST(nums)
+
+# Split the dataset into training and testing sets
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
-# # Paramètres liés au réseau et à l'apprentissage
+# Define the parameters for the DNN and the training process
 p = X.shape[1]
 q = 40
 learning_rate = 0.075
@@ -19,9 +32,7 @@ nb_iter = 100
 n_epochs = 21
 nb_gibbs_iteration = 8
 nb_image_generate = 1
-layers = [p,q,len(nums)]
-
-## Analyse : Création des courbes
+layers = [p, q, len(nums)]
 
 # Define the number of neurons for hidden layers
 neurons_range = [100, 300, 500, 700]
@@ -32,6 +43,7 @@ pretrained_test_accuracies = []
 non_pretrained_train_accuracies = []
 non_pretrained_test_accuracies = []
 
+# Train a DNN with pretraining and without pretraining for each hidden layer size
 for neurons in neurons_range:
     # Create a list representing the layers of the network
     layers = [p, neurons, neurons, len(nums)]
@@ -62,19 +74,3 @@ plt.xlabel('Number of neurons in hidden layers')
 plt.ylabel('Accuracy')
 plt.legend()
 plt.show()
-
-# # # Entrainement du DNN avec pretraining
-# dnn = DNN(layers)
-# dnn.pretrain_DNN(X_train, learning_rate, batch_size, nb_iter)
-# dnn.retropropagation(X_train, Y_train, learning_rate, n_epochs, batch_size)
-
-# # # Comparaison avec un DNN sans pretraining
-# dnn_without_pretraining = DNN(layers)
-# dnn_without_pretraining.retropropagation(X_train, Y_train, learning_rate, n_epochs, batch_size)
-
-# print('\n')
-# print('Pre-trained DNN - Train accuracy:', dnn.test_DNN(X_train, Y_train))
-# print('Pre-trained DNN - Test accuracy:', dnn.test_DNN(X_test, Y_test))
-# print('\n')
-# print('Not-pre-trained DNN - Train accuracy:', dnn_without_pretraining.test_DNN(X_train, Y_train))
-# print('Not-pre-trained DNN - Test accuracy:', dnn_without_pretraining.test_DNN(X_test, Y_test))
