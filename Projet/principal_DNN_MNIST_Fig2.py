@@ -61,6 +61,8 @@ def main():
         non_pretrained_test_mistake_rate = dnn_without_pretraining.test_DNN(X_test, Y_test)
         non_pretrained_train_mistake_rates.append(non_pretrained_train_mistake_rate)
         non_pretrained_test_mistake_rates.append(non_pretrained_test_mistake_rate)
+        
+        print('Finished training for', neurons, 'neurons in hidden layers')
 
     # Plot the mistake_rates
     plt.plot(neurons_range, pretrained_train_mistake_rates, 'o-', linewidth=1, label='With pretraining - Train')
