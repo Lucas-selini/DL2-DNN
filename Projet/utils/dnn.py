@@ -127,7 +127,7 @@ class DNN():
             Y (np.array): Target labels of size n*q.
 
         Returns:
-            (float): Accuracy of the DNN.
+            (float): Mistake rate of the DNN.
         """
         # Process the input through the network
         _, Y_hat = self.entree_sortie_reseau(X)
@@ -138,4 +138,4 @@ class DNN():
         # Calculate the accuracy
         accuracy = np.mean(correct_predictions)
 
-        return accuracy
+        return 1 - accuracy

@@ -2,8 +2,6 @@ from scipy.io import loadmat
 import numpy as np
 import matplotlib.pyplot as plt
 
-plt.use('TkAgg')
-
 def lire_alpha_digit(char):
     """
     Read and return the binaryalphadigs.mat dataset for the given characters.
@@ -36,21 +34,32 @@ def lire_MNIST(nums):
         nums (list): List of numbers to learn.
 
     Returns:
-        tuple: A tuple containing two numpy arrays - the data and the labels.
+        tuple: A tuple containing 4 numpy arrays - the data and the labels, seperated in training and test sets.
     """
     seuil = 128
     mat = loadmat("data/mnist_all.mat")
-    Y = []
-    output = []
+    X_train = []
+    X_test = []
+    Y_train = []
+    Y_test = []
+    
     for num in nums:
-        data = mat[f'train{num}']
-        for ligne in data:
+        data_train = mat[f'train{num}']
+        data_test = mat[f'test{num}']
+        
+        for ligne in data_train:
             ligne_output = [1 if pixel >= seuil else 0 for pixel in ligne]
-            output.append(ligne_output)
+            X_train.append(ligne_output)
+            
+        for ligne in data_test:
+            ligne_output = [1 if pixel >= seuil else 0 for pixel in ligne]
+            X_test.append(ligne_output)
+            
         one_hot = [1 if i == num else 0 for i in nums]
-        Y.extend([one_hot] * len(data))
+        Y_train.extend([one_hot] * len(data_train))
+        Y_test.extend([one_hot] * len(data_test))
 
-    return np.array(output), np.array(Y)
+    return np.array(X_train), np.array(X_test), np.array(Y_train), np.array(Y_test)
 
 def display_image(images, height, width, save=False):
     """
