@@ -46,7 +46,11 @@ def main():
     for train_size in data_train_range:
         
         # Split the dataset into training and testing sets
-        X_train_split, _, Y_train_split, _ = train_test_split(X_train, Y_train, train_size=train_size, random_state=42)
+        if train_size == 60000:
+            X_train_split, Y_train_split = X_train, Y_train
+        else:
+        # Split the dataset into training and testing sets
+            X_train_split, _, Y_train_split, _ = train_test_split(X_train, Y_train, train_size=train_size, random_state=42)
         
         # Train a DNN with pretraining
         dnn = DNN(layers)
