@@ -23,11 +23,8 @@ layers = [p,q,len(nums)]
 
 ## Analyse : Création des courbes
 
-# Define the number of neurons per layer
-neurons_per_layer = 200
-
-# Define the range of layers to test
-layers_range = range(2, 6)
+# Define the number of neurons for hidden layers
+neurons_range = [100, 300, 500, 700]
 
 # Initialize lists to store accuracies
 pretrained_train_accuracies = []
@@ -35,9 +32,9 @@ pretrained_test_accuracies = []
 non_pretrained_train_accuracies = []
 non_pretrained_test_accuracies = []
 
-for n_layers in layers_range:
+for neurons in neurons_range:
     # Create a list representing the layers of the network
-    layers = [p] + [neurons_per_layer]*(n_layers) + [len(nums)]
+    layers = [p, neurons, neurons, len(nums)]
 
     # Train a DNN with pretraining
     dnn = DNN(layers)
@@ -57,11 +54,11 @@ for n_layers in layers_range:
     non_pretrained_test_accuracies.append(non_pretrained_test_accuracy)
 
 # Plot the accuracies
-plt.plot(layers_range, pretrained_train_accuracies, label='With pretraining - Train')
-plt.plot(layers_range, pretrained_test_accuracies, label='With pretraining - Test')
-plt.plot(layers_range, non_pretrained_train_accuracies, label='Without pretraining - Train')
-plt.plot(layers_range, non_pretrained_test_accuracies, label='Without pretraining - Test')
-plt.xlabel('Number of layers')
+plt.plot(neurons_range, pretrained_train_accuracies, 'o-', linewidth=1, label='With pretraining - Train')
+plt.plot(neurons_range, pretrained_test_accuracies, 'o-', linewidth=1, label='With pretraining - Test')
+plt.plot(neurons_range, non_pretrained_train_accuracies, 'o-', linewidth=1, label='Without pretraining - Train')
+plt.plot(neurons_range, non_pretrained_test_accuracies, 'o-', linewidth=1, label='Without pretraining - Test')
+plt.xlabel('Number of neurons in hidden layers')
 plt.ylabel('Accuracy')
 plt.legend()
 plt.show()
