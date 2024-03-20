@@ -1,6 +1,7 @@
 import numpy as np
 from utils.dnn import DNN
 from utils.utils import *
+import matplotlib.pyplot as plt
 # import time
 # import copy
 
@@ -20,19 +21,63 @@ nb_gibbs_iteration = 8
 nb_image_generate = 1
 layers = [p,q,len(nums)]
 
-# # Entrainement du DNN
-dnn = DNN(layers)
-dnn.pretrain_DNN(X_train, learning_rate, batch_size, nb_iter)
-dnn.retropropagation(X_train, Y_train, learning_rate, n_epochs, batch_size)
+## Analyse : Création des courbes
 
-# # Comparaison avec un DNN uniquement pre-trained
-dnn_pretrained = DNN(layers)
-dnn_pretrained.pretrain_DNN(X_train, learning_rate, batch_size, nb_iter)
+# Define the number of neurons per layer
+neurons_per_layer = 200
 
-print('\n')
-print('Trained DNN - Train accuracy:', dnn.test_DNN(X_train, Y_train))
-print('Trained DNN - Test accuracy:', dnn.test_DNN(X_test, Y_test))
-print('\n')
-print('Pre-trained DNN - Train accuracy:', dnn_pretrained.test_DNN(X_train, Y_train))
-print('Pre-trained DNN - Test accuracy:', dnn_pretrained.test_DNN(X_test, Y_test))
+# Define the range of layers to test
+layers_range = range(2, 6)
 
+# Initialize lists to store accuracies
+pretrained_train_accuracies = []
+pretrained_test_accuracies = []
+non_pretrained_train_accuracies = []
+non_pretrained_test_accuracies = []
+
+for n_layers in layers_range:
+    # Create a list representing the layers of the network
+    layers = [p] + [neurons_per_layer]*(n_layers) + [len(nums)]
+
+    # Train a DNN with pretraining
+    dnn = DNN(layers)
+    dnn.pretrain_DNN(X_train, learning_rate, batch_size, nb_iter)
+    dnn.retropropagation(X_train, Y_train, learning_rate, n_epochs, batch_size)
+    pretrained_train_accuracy = dnn.test_DNN(X_train, Y_train)
+    pretrained_test_accuracy = dnn.test_DNN(X_test, Y_test)
+    pretrained_train_accuracies.append(pretrained_train_accuracy)
+    pretrained_test_accuracies.append(pretrained_test_accuracy)
+
+    # Train a DNN without pretraining
+    dnn_without_pretraining = DNN(layers)
+    dnn_without_pretraining.retropropagation(X_train, Y_train, learning_rate, n_epochs, batch_size)
+    non_pretrained_train_accuracy = dnn_without_pretraining.test_DNN(X_train, Y_train)
+    non_pretrained_test_accuracy = dnn_without_pretraining.test_DNN(X_test, Y_test)
+    non_pretrained_train_accuracies.append(non_pretrained_train_accuracy)
+    non_pretrained_test_accuracies.append(non_pretrained_test_accuracy)
+
+# Plot the accuracies
+plt.plot(layers_range, pretrained_train_accuracies, label='With pretraining - Train')
+plt.plot(layers_range, pretrained_test_accuracies, label='With pretraining - Test')
+plt.plot(layers_range, non_pretrained_train_accuracies, label='Without pretraining - Train')
+plt.plot(layers_range, non_pretrained_test_accuracies, label='Without pretraining - Test')
+plt.xlabel('Number of layers')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
+
+# # # Entrainement du DNN avec pretraining
+# dnn = DNN(layers)
+# dnn.pretrain_DNN(X_train, learning_rate, batch_size, nb_iter)
+# dnn.retropropagation(X_train, Y_train, learning_rate, n_epochs, batch_size)
+
+# # # Comparaison avec un DNN sans pretraining
+# dnn_without_pretraining = DNN(layers)
+# dnn_without_pretraining.retropropagation(X_train, Y_train, learning_rate, n_epochs, batch_size)
+
+# print('\n')
+# print('Pre-trained DNN - Train accuracy:', dnn.test_DNN(X_train, Y_train))
+# print('Pre-trained DNN - Test accuracy:', dnn.test_DNN(X_test, Y_test))
+# print('\n')
+# print('Not-pre-trained DNN - Train accuracy:', dnn_without_pretraining.test_DNN(X_train, Y_train))
+# print('Not-pre-trained DNN - Test accuracy:', dnn_without_pretraining.test_DNN(X_test, Y_test))

@@ -45,46 +45,66 @@ class DNN():
             L.append(X)
         return L, self.calcul_softmax(L[-1])
     
-    def retropropagation(self, X, Y, learning_rate,n_epochs,batch_size):
+    def retropropagation(self, X, Y, learning_rate, n_epochs, batch_size):
         """
         Args:
-            X (np.array): size n*p
-            Y (np.array): size n*q
+            X (np.array): size n*p, input data
+            Y (np.array): size n*q, target labels
             learning_rate (float): learning rate
             n_epochs (int): number of epochs
             batch_size (int): batch size
         """
-        X_copy= X.copy()
+        X_copy = X.copy()
         losses = []
 
         for epoch in range(n_epochs):
+            # Iterate over batches
             for j in range(0, X_copy.shape[0], batch_size):
-                X_batch = X_copy[j:min(j+batch_size, X_copy.shape[0])]
-                Y_batch = Y[j:min(j+batch_size, X_copy.shape[0])]
+                X_batch = X_copy[j:min(j + batch_size, X_copy.shape[0])]
+                Y_batch = Y[j:min(j + batch_size, X_copy.shape[0])]
                 tb = X_batch.shape[0]
+
+                # Forward pass
                 L, Y_hat = self.entree_sortie_reseau(X_batch)
+
+                # Calculate the error
                 delta = Y_hat - Y_batch
+
+                # Create a copy of the DBN
                 dbn_copy = copy.deepcopy(self.dbn)
-                
-                for i in range(self.dbn.n_layers-2, -1, -1):
+
+                # Backpropagation
+                for i in range(self.dbn.n_layers - 2, -1, -1):
+                    # Update biases
                     dbn_copy.rbms[i].b -= learning_rate * np.mean(delta, axis=0)
+
+                    # Update weights
                     dbn_copy.rbms[i].W -= learning_rate * np.dot(L[i].T, delta) / tb
+
+                    # Calculate the error for the previous layer
                     delta = np.dot(delta, self.dbn.rbms[i].W.T) * L[i] * (1 - L[i])
-                    
+
+                # Update the DBN
                 self.dbn = dbn_copy
 
+            # Calculate the loss
             L, Y_hat = self.entree_sortie_reseau(X_copy)
             loss = -np.mean(Y * np.log(Y_hat))
+
+            # Print the loss every 5 epochs
             if epoch % 5 == 0:
-                print(f"Loss at epoch {epoch} : {loss}")
+                print(f"Loss at epoch {epoch}: {loss}")
+
+            # Store the loss
             losses.append(loss)
-        plt.plot(range(len(losses)),losses)
-        plt.xlabel('Epochs')
-        plt.ylabel('Loss')
-        plt.title('Loss over epochs')
-        plt.show()
-        plt.savefig('loss.png')
-        plt.close()
+            
+        # plt.plot(range(len(losses)),losses)
+        # plt.xlabel('Epochs')
+        # plt.ylabel('Loss')
+        # plt.title('Loss over epochs')
+        # plt.show()
+        # plt.savefig('loss.png')
+        # plt.close()
 
     def test_DNN(self, X, Y):
         """
