@@ -23,13 +23,14 @@ def main():
     # Load the MNIST dataset for the specified digit classes
     nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     X_train, X_test, Y_train, Y_test = lire_MNIST(nums)
+    X_train, _, Y_train, _ = train_test_split(X_train, Y_train, train_size=48000, random_state=42)
 
     # Define the parameters for the DNN and the training process
     p = X_train.shape[1]
     learning_rate = 0.075
     batch_size = 125
     nb_iter = 100
-    n_epochs = 51
+    n_epochs = 201
 
     # Define the number of neurons for hidden layers
     neurons_range = [100, 300, 500, 700, 900]

@@ -30,11 +30,11 @@ def main():
     learning_rate = 0.075
     batch_size = 125
     nb_iter = 100
-    n_epochs = 51
+    n_epochs = 201
     layers = [p, q, q, len(nums)]
 
     # Define the number of training datas to train the DNN
-    data_train_range = [1000, 3000, 7000, 10000, 30000, 60000]
+    data_train_range = [100, 250, 500, 750, 1000, 3000, 7000, 10000, 15000, 20000, 25000, 30000, 40000, 45000, 50000, 55000, 60000]
 
     # Initialize lists to store mistake_rates
     pretrained_train_mistake_rates = []
