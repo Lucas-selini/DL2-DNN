@@ -48,4 +48,5 @@ class DBN():
             v = (np.random.rand(n_images, self.rbms[self.n_layers-2].a.shape[0]) < self.rbms[self.n_layers-2].sortie_entree(h)).astype(int)
         for i in range(self.n_layers-3, -1, -1):
             v = self.rbms[i].sortie_entree(v)
+        v = np.round(v) # Binarize the output
         return np.array(v)
