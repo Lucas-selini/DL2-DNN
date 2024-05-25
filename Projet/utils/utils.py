@@ -90,3 +90,7 @@ def display_image(images, height, width, save=False):
     if save:
         plt.savefig("generated_image.png")
     plt.show()
+    
+# Ajout de la fonction sigmoïde pour un calcul plus propre et réutilisable
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
