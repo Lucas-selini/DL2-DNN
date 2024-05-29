@@ -1,4 +1,4 @@
-from utils.dbn import DBN
+from utils.dbnv2 import DBN
 import copy
 import numpy as np
 import matplotlib.pyplot as plt

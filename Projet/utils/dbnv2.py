@@ -59,3 +59,6 @@ class DBN():
             generated_images.append(np.round(v))
 
         return np.array(generated_images)
+    
+    def count_parameters(self):
+        return sum([rbm.count_parameters() for rbm in self.rbms])

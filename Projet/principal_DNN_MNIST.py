@@ -9,7 +9,7 @@ The script performs the following steps:
 5. Calculate the mistake rate.
 """
 
-from utils.dnn import DNN
+from utils.dnnv2 import DNN
 from utils.utils import *
 from sklearn.model_selection import train_test_split
 
@@ -20,13 +20,13 @@ def main():
     
     # Define the parameters for the DNN and the training process
     p = X_train.shape[1]
-    q = 300
-    learning_rate = 0.075
-    batch_size = 125
-    nb_iter = 100
-    n_epochs = 61   
+    q = 100
+    learning_rate = 0.1
+    batch_size = 50
+    nb_iter = 75
+    n_epochs = 15
     layers = [p, q, q, q, len(nums)]
-    X_train_split, _, Y_train_split, _ = train_test_split(X_train, Y_train, train_size=30000, random_state=42)
+    X_train_split, _, Y_train_split, _ = train_test_split(X_train, Y_train, train_size=20000, random_state=42)
     
     # Train a DNN with pretraining
     dnn = DNN(layers)

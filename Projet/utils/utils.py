@@ -85,7 +85,7 @@ def display_image(images, height, width, save=False):
         plt.subplot(rows, cols, i + 1)
         plt.imshow(generated_images_array[i], cmap='gray')  # Set cmap to 'gray' for black and white
         plt.axis('off')
-
+    
     plt.tight_layout()
     if save:
         plt.savefig("generated_image.png")

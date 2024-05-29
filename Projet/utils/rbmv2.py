@@ -127,3 +127,6 @@ class RBM():
             generated_images.append(v)
 
         return generated_images
+
+    def count_parameters(self):
+        return self.W.size + self.a.size + self.b.size
