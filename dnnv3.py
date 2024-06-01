@@ -174,3 +174,12 @@ class DNN():
         print("Erreur :", 1 - accuracy)
 
         return 1 - accuracy
+
+    # def test_DNN(self, data, labels):
+    #     sorties = self.entree_sortie_reseau(data)
+    #     prob = sorties[-1]
+    #     predictions = np.argmax(prob, axis=1)
+    #     labels_not_one_hot = np.argmax(labels, axis=1)
+    #     accuracy = np.mean(predictions == labels_not_one_hot)
+    #     print("Erreur :", 1 - accuracy)
+    #     return 1-accuracy
