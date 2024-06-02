@@ -20,18 +20,25 @@ def main():
     # Load the MNIST dataset for the specified digit classes
     nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     X_train, X_test, Y_train, Y_test = lire_MNIST(nums)
-    X_train, _, Y_train, _ = train_test_split(X_train, Y_train, train_size=48000, random_state=42)
+    
+    # read X_train , X_test, Y_train, Y_test :
+    # X_train = np.load('data/X_train_MNIST.npy')
+    # X_test = np.load('data/X_test_MNIST.npy')
+    # Y_train = np.load('data/Y_train_MNIST.npy')
+    # Y_test = np.load('data/Y_test_MNIST.npy')
+    X_train, _, Y_train, _ = train_test_split(X_train, Y_train, train_size=30000, random_state=46)
     
     # Define the parameters for the DNN and the training process
     p = X_train.shape[1]
-    q = 200 
-    learning_rate = 0.075
-    batch_size = 125
-    nb_iter = 100
-    n_epochs = 201
+    q = 100
+    n_classes = len(nums)
+    learning_rate = 0.1
+    batch_size = 64
+    nb_iter = 76
+    n_epochs = 126
 
     # Define the number of hidden layers
-    num_hidden_layers = range(0, 6)
+    num_hidden_layers = range(1, 6)
 
     # Initialize lists to store mistake_rates
     pretrained_train_mistake_rates = []
@@ -42,20 +49,20 @@ def main():
     # Train a DNN with pretraining and without pretraining for each number of hidden layers
     for num_layers in num_hidden_layers:
         # Create a list representing the layers of the network
-        layers = [p] + [q] * num_layers + [len(nums)]
+        layers = [p] + [q] * num_layers
 
         # Train a DNN with pretraining
-        dnn = DNN(layers)
-        dnn.pretrain_DNN(X_train, learning_rate, batch_size, nb_iter)
-        dnn.retropropagation(X_train, Y_train, learning_rate, n_epochs, batch_size)
+        dnn = DNN(layers, n_classes)
+        dnn.pretrain_DNN(X_train, learning_rate, batch_size, nb_iter, verbose=False, plot=False)
+        dnn.retropropagation(X_train, Y_train, learning_rate, n_epochs, batch_size, verbose=True, plot=True)
         pretrained_train_mistake_rate = dnn.test_DNN(X_train, Y_train)
         pretrained_test_mistake_rate = dnn.test_DNN(X_test, Y_test)
         pretrained_train_mistake_rates.append(pretrained_train_mistake_rate)
         pretrained_test_mistake_rates.append(pretrained_test_mistake_rate)
 
         # Train a DNN without pretraining
-        dnn_without_pretraining = DNN(layers)
-        dnn_without_pretraining.retropropagation(X_train, Y_train, learning_rate, n_epochs, batch_size)
+        dnn_without_pretraining = DNN(layers, n_classes)
+        dnn_without_pretraining.retropropagation(X_train, Y_train, learning_rate, n_epochs, batch_size, verbose=True, plot=True)
         non_pretrained_train_mistake_rate = dnn_without_pretraining.test_DNN(X_train, Y_train)
         non_pretrained_test_mistake_rate = dnn_without_pretraining.test_DNN(X_test, Y_test)
         non_pretrained_train_mistake_rates.append(non_pretrained_train_mistake_rate)

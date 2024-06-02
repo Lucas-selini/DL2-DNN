@@ -1,11 +1,17 @@
-# prerequisites
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
 from torchvision import datasets, transforms
-from torch.autograd import Variable
-from torchvision.utils import save_image
+import numpy as np
+
+### Inspired by https://github.com/lyeoni/pytorch-mnist-VAE
+
+def load_mnist_vae(size,batch_size):
+    train_dataset = datasets.MNIST(root='./mnist_data/', train=True, transform=transforms.ToTensor(), download=True)
+    idx = np.random.choice(len(train_dataset), size, replace=False)
+    train_dataset = torch.utils.data.Subset(train_dataset, idx)
+    train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+    return train_loader
 
 class VAE(nn.Module):
     def __init__(self, x_dim, h_dim1, h_dim2, z_dim):
@@ -41,47 +47,36 @@ class VAE(nn.Module):
         z = self.sampling(mu, log_var)
         return self.decoder(z), mu, log_var
     
-    def loss_function(recon_x, x, mu, log_var):
+    def loss_function(self, recon_x, x, mu, log_var):
         BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), reduction='sum')
         KLD = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
         return BCE + KLD
-
-    def train(epoch, vae, train_loader, optimizer, loss_function):
-        vae.train()
+    
+    def train_epoch(self, epoch, train_loader, optimizer, device='cpu', verbose=True):
         train_loss = 0
         for batch_idx, (data, _) in enumerate(train_loader):
-            data = data.cuda()
+            data = data.to(device)
             optimizer.zero_grad()
             
-            recon_batch, mu, log_var = vae(data)
-            loss = loss_function(recon_batch, data, mu, log_var)
+            recon_batch, mu, log_var = self(data)
+            loss = self.loss_function(recon_batch, data, mu, log_var)
             
             loss.backward()
             train_loss += loss.item()
             optimizer.step()
             
-            if batch_idx % 100 == 0:
+            if verbose and batch_idx % 100 == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(train_loader.dataset),
                     100. * batch_idx / len(train_loader), loss.item() / len(data)))
         print('====> Epoch: {} Average loss: {:.4f}'.format(epoch, train_loss / len(train_loader.dataset)))
+    
+    def train_model(self,  epochs, train_loader, optimizer, device='cpu', verbose=True):
+        self.to(device)
+        self.train()
+        for epoch in range(1, epochs + 1):
+            self.train_epoch(epoch, train_loader, optimizer, device, verbose)
 
-    def test(vae, test_loader, loss_function, z):
-        vae.eval()
-        test_loss= 0
-        with torch.no_grad():
-            for data, _ in test_loader:
-                data = data.cuda()
-                recon, mu, log_var = vae(data)
-                
-                # sum up batch loss
-                test_loss += loss_function(recon, data, mu, log_var).item()
-            
-        test_loss /= len(test_loader.dataset)
-        print('====> Test set loss: {:.4f}'.format(test_loss))
-
-        with torch.no_grad():
-        z = torch.randn(64, 2).cuda()
-        sample = vae.decoder(z).cuda()
-        
-        save_image(sample.view(64, 1, 28, 28), './samples/sample_' + '.png')
+    def count_parameters(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+    

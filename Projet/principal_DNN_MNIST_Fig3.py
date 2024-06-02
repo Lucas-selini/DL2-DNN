@@ -17,24 +17,28 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
 def main():
-    """
-    Main function that trains and compares the performance of a Deep Neural Network (DNN) with and without pretraining on the MNIST dataset.
-    """
     # Load the MNIST dataset for the specified digit classes
     nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     X_train, X_test, Y_train, Y_test = lire_MNIST(nums)
+    
+    # read X_train , X_test, Y_train, Y_test :
+    # X_train = np.load('data/X_train_MNIST.npy')
+    # X_test = np.load('data/X_test_MNIST.npy')
+    # Y_train = np.load('data/Y_train_MNIST.npy')
+    # Y_test = np.load('data/Y_test_MNIST.npy')
 
     # Define the parameters for the DNN and the training process
     p = X_train.shape[1]
     q = 200
-    learning_rate = 0.075
-    batch_size = 125
-    nb_iter = 100
-    n_epochs = 201
-    layers = [p, q, q, len(nums)]
+    n_classes = len(nums)
+    learning_rate = 0.1
+    batch_size = 64
+    nb_iter = 76
+    n_epochs = 126
+    layers = [p, q, q]
 
     # Define the number of training datas to train the DNN
-    data_train_range = [100, 250, 500, 750, 1000, 3000, 7000, 10000, 15000, 20000, 25000, 30000, 40000, 45000, 50000, 55000, 60000]
+    data_train_range = [100, 250, 500, 750, 1000, 3000, 7000, 10000, 15000, 30000, 60000]
 
     # Initialize lists to store mistake_rates
     pretrained_train_mistake_rates = []
@@ -53,17 +57,17 @@ def main():
             X_train_split, _, Y_train_split, _ = train_test_split(X_train, Y_train, train_size=train_size, random_state=42)
         
         # Train a DNN with pretraining
-        dnn = DNN(layers)
-        dnn.pretrain_DNN(X_train_split, learning_rate, batch_size, nb_iter)
-        dnn.retropropagation(X_train_split, Y_train_split, learning_rate, n_epochs, batch_size)
+        dnn = DNN(layers, n_classes)
+        dnn.pretrain_DNN(X_train_split, learning_rate, batch_size, nb_iter, verbose=False, plot=False)
+        dnn.retropropagation(X_train_split, Y_train_split, learning_rate, n_epochs, batch_size, verbose=False, plot=False)
         pretrained_train_mistake_rate = dnn.test_DNN(X_train_split, Y_train_split)
         pretrained_test_mistake_rate = dnn.test_DNN(X_test, Y_test)
         pretrained_train_mistake_rates.append(pretrained_train_mistake_rate)
         pretrained_test_mistake_rates.append(pretrained_test_mistake_rate)
 
         # Train a DNN without pretraining
-        dnn_without_pretraining = DNN(layers)
-        dnn_without_pretraining.retropropagation(X_train_split, Y_train_split, learning_rate, n_epochs, batch_size)
+        dnn_without_pretraining = DNN(layers, n_classes)
+        dnn_without_pretraining.retropropagation(X_train_split, Y_train_split, learning_rate, n_epochs, batch_size, verbose=False, plot=False)
         non_pretrained_train_mistake_rate = dnn_without_pretraining.test_DNN(X_train_split, Y_train_split)
         non_pretrained_test_mistake_rate = dnn_without_pretraining.test_DNN(X_test, Y_test)
         non_pretrained_train_mistake_rates.append(non_pretrained_train_mistake_rate)

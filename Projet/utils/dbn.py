@@ -12,7 +12,7 @@ class DBN():
         self.n_layers = len(couche)
         self.rbms = [RBM(couche[i], couche[i+1]) for i in range(self.n_layers-1)]
 
-    def train(self, X, learning_rate, batch_size, nb_iter):
+    def train(self, X, learning_rate, batch_size, nb_iter, verbose=False, plot=False):
         """
         Trains the DBN model.
 
@@ -21,16 +21,17 @@ class DBN():
             nb_iter (int): Number of iterations.
             learning_rate (float): Learning rate.
             batch_size (int): Batch size.
+            verbose (bool): If True, prints the loss at each iteration.
+            plot (bool): If True, plots the loss at each iteration.
 
         Returns:
             None
         """
         X_copy = X.copy()
         for i in range(self.n_layers-1):
-            self.rbms[i].train(X_copy, learning_rate, batch_size, nb_iter)
+            self.rbms[i].train(X_copy, learning_rate, batch_size, nb_iter, verbose, plot)
             X_copy = self.rbms[i].entree_sortie(X_copy)
 
-    
     def generer_image(self, n_gibbs, n_images):
         """
         Generates images using the trained DBN model.
@@ -42,11 +43,22 @@ class DBN():
         Returns:
             np.array: Array of generated images of size n_images*p.
         """
-        v = (np.random.rand(n_images, self.rbms[self.n_layers-2].a.shape[0]) < np.random.rand(n_images, self.rbms[self.n_layers-2].a.shape[0])).astype(int)
-        for j in range(n_gibbs):
-            h = (np.random.rand(n_images, self.rbms[self.n_layers-2].b.shape[0]) < self.rbms[self.n_layers-2].entree_sortie(v)).astype(int)
-            v = (np.random.rand(n_images, self.rbms[self.n_layers-2].a.shape[0]) < self.rbms[self.n_layers-2].sortie_entree(h)).astype(int)
-        for i in range(self.n_layers-3, -1, -1):
-            v = self.rbms[i].sortie_entree(v)
-        v = np.round(v) # Binarize the output
-        return np.array(v)
+        generated_images = []
+        for _ in range(n_images):
+            v = np.random.rand(1, self.rbms[0].p)
+
+            for _ in range(n_gibbs):
+                for i in range(self.n_layers-1):
+                    prob_h = self.rbms[i].entree_sortie(v)
+                    v = (np.random.rand(1, self.rbms[i].q) < prob_h).astype(int)
+
+                for i in range(self.n_layers-2, -1, -1):
+                    prob_v = self.rbms[i].sortie_entree(v)
+                    v = (np.random.rand(1, self.rbms[i].p) < prob_v).astype(int)
+
+            generated_images.append(np.round(v))
+
+        return np.array(generated_images)
+    
+    def count_parameters(self):
+        return sum([rbm.count_parameters() for rbm in self.rbms])

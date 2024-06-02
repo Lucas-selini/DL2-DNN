@@ -1,20 +1,21 @@
 from utils.dbn import DBN
-import copy
+from utils.rbm import RBM
 import numpy as np
 import matplotlib.pyplot as plt
 
 class DNN():
-    def __init__(self, couche):
+    def __init__(self, couche, n_classes):
         """
         Deep Neural Network (DNN) class.
 
         Args:
             couche (list): List of number of neurons for each layer.
+            n_classes (int): Number of output classes.
         """
         self.dbn = DBN(couche)
-        
-    
-    def pretrain_DNN(self, X, learning_rate, batch_size, nb_iter):
+        self.output_layer = RBM(couche[-1], n_classes)
+
+    def pretrain_DNN(self, X, learning_rate, batch_size, nb_iter, verbose=False, plot=False):
         """
         Pretrains the DNN using the Deep Belief Network (DBN).
 
@@ -23,9 +24,11 @@ class DNN():
             learning_rate (float): Learning rate.
             batch_size (int): Batch size.
             nb_iter (int): Number of iterations.
+            verbose (bool): If True, print training progress.
+            plot (bool): If True, plot training loss.
         """
-        self.dbn.train(X, learning_rate, batch_size, nb_iter)
-    
+        self.dbn.train(X, learning_rate, batch_size, nb_iter, verbose, plot)
+
     def calcul_softmax(self, X):
         """
         Calculates the softmax function for the input array.
@@ -36,9 +39,10 @@ class DNN():
         Returns:
             (np.array): Array of size n*q.
         """
-        return np.exp(X) / np.sum(np.exp(X), axis=1, keepdims=True)
+        prob = np.dot(X, self.output_layer.W) + self.output_layer.b
+        return np.exp(prob) / np.sum(np.exp(prob), axis=1, keepdims=True)
 
-    def entree_sortie_reseau(self,X):
+    def entree_sortie_reseau(self, X):
         """
         Performs the forward pass through the network.
 
@@ -47,15 +51,16 @@ class DNN():
 
         Returns:
             (list): List of size n_layers, each element is an array of size n*q.
-            (np.array): Array of size n*q.
         """
-        L = [X]
+        X_copy = X.copy()
+        L = [X_copy]
         for rbm in self.dbn.rbms:
-            X = rbm.entree_sortie(X)
-            L.append(X)
-        return L, self.calcul_softmax(L[-1])
-    
-    def retropropagation(self, X, Y, learning_rate, n_epochs, batch_size):
+            X_copy = rbm.entree_sortie(X_copy)
+            L.append(X_copy)
+        L.append(self.calcul_softmax(L[-1]))
+        return L
+
+    def retropropagation(self, X, Y, learning_rate, n_epochs, batch_size, verbose=False, plot=True):
         """
         Performs the backpropagation algorithm to train the DNN.
 
@@ -65,58 +70,66 @@ class DNN():
             learning_rate (float): Learning rate.
             n_epochs (int): Number of epochs.
             batch_size (int): Batch size.
+            verbose (bool): If True, print loss at each 10% of epochs.
+            plot (bool): If True, plot the loss curve.
         """
         X_copy = X.copy()
         losses = []
 
         for epoch in range(n_epochs):
+            Y_copy = Y.copy()
             # Iterate over batches
             for j in range(0, X_copy.shape[0], batch_size):
                 X_batch = X_copy[j:min(j + batch_size, X_copy.shape[0])]
-                Y_batch = Y[j:min(j + batch_size, X_copy.shape[0])]
+                Y_batch = Y_copy[j:min(j + batch_size, X_copy.shape[0])]
                 tb = X_batch.shape[0]
 
                 # Forward pass
-                L, Y_hat = self.entree_sortie_reseau(X_batch)
+                L = self.entree_sortie_reseau(X_batch)
+                Y_hat = L[-1]
 
                 # Calculate the error
                 delta = Y_hat - Y_batch
 
-                # Create a copy of the DBN
-                dbn_copy = copy.deepcopy(self.dbn)
+                # Update weights and biases for the output layer first
+                db = np.sum(delta, axis=0) / tb
+                dW = np.dot(L[-2].T, delta) / tb
+                self.output_layer.b -= learning_rate * db
+                self.output_layer.W -= learning_rate * dW
 
                 # Backpropagation
-                for i in range(self.dbn.n_layers - 2, -1, -1):
+                delta = np.dot(delta, self.output_layer.W.T) * L[-2] * (1 - L[-2])
+                for i in reversed(range(len(self.dbn.rbms))):
+                    rbm = self.dbn.rbms[i]
                     # Update biases
-                    dbn_copy.rbms[i].b -= learning_rate * np.mean(delta, axis=0)
-
+                    rbm.b -= learning_rate * np.sum(delta, axis=0) / tb
+                    
                     # Update weights
-                    dbn_copy.rbms[i].W -= learning_rate * np.dot(L[i].T, delta) / tb
-
+                    rbm.W -= learning_rate * np.dot(L[i].T, delta) / tb
+                    
                     # Calculate the error for the previous layer
-                    delta = np.dot(delta, self.dbn.rbms[i].W.T) * L[i] * (1 - L[i])
-
-                # Update the DBN
-                self.dbn = dbn_copy
+                    if i != 0:
+                        delta = np.dot(delta, rbm.W.T) * L[i] * (1 - L[i])
 
             # Calculate the loss
-            L, Y_hat = self.entree_sortie_reseau(X_copy)
+            L = self.entree_sortie_reseau(X_copy)
+            Y_hat = L[-1]
             loss = -np.mean(Y * np.log(Y_hat))
 
             # Print the loss every 5 epochs
-            if epoch % 5 == 0:
+            if verbose and epoch % 5 == 0:
                 print(f"Loss at epoch {epoch}: {loss}")
 
             # Store the loss
             losses.append(loss)
-            
-        # plt.plot(range(len(losses)),losses)
-        # plt.xlabel('Epochs')
-        # plt.ylabel('Loss')
-        # plt.title('Loss over epochs')
-        # plt.show()
-        # plt.savefig('loss.png')
-        # plt.close()
+
+        # Plot the loss curve
+        if plot:
+            plt.plot(range(len(losses)), losses)
+            plt.xlabel('Epochs')
+            plt.ylabel('Loss')
+            plt.title('Loss over epochs')
+            plt.show()
 
     def test_DNN(self, X, Y):
         """
@@ -130,8 +143,9 @@ class DNN():
             (float): Mistake rate of the DNN.
         """
         # Process the input through the network
-        _, Y_hat = self.entree_sortie_reseau(X)
-
+        L_ = self.entree_sortie_reseau(X)
+        Y_hat = L_[-1]
+        
         # Compare the predicted and actual classes
         correct_predictions = np.argmax(Y_hat, axis=1) == np.argmax(Y, axis=1)
 

@@ -1,5 +1,6 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
+from utils.utils import sigmoid
 class RBM():
     def __init__(self, p, q):
         """
@@ -13,7 +14,7 @@ class RBM():
         self.q = q
         self.a = np.zeros(p)
         self.b = np.zeros(q)
-        self.W = np.random.randn(p, q) * np.sqrt(0.01)
+        self.W = np.random.normal(0, 0.01, (self.p, self.q))
 
     def entree_sortie(self, X):
         """
@@ -25,9 +26,10 @@ class RBM():
         Return:
             (np.array) array of size n*q
         """
-        sortie = 1 / (1 + np.exp(-(X @ self.W + self.b)))
+        prob_q = X @ self.W + self.b
+        sortie = sigmoid(prob_q)
         return sortie
-
+    
     def sortie_entree(self, H):
         """
         Compute the input of the RBM given the output.
@@ -38,10 +40,11 @@ class RBM():
         Return:
             (np.array) array of size n*p
         """
-        entree = 1 / (1 + np.exp(-(H @ self.W.T + self.a)))
+        prob_p = H @ self.W.T + self.a
+        entree = sigmoid(prob_p)
         return entree
 
-    def train(self, X, lr, batch_size, nb_iter):
+    def train(self, X, lr, batch_size, nb_iter, verbose=False, plot=True):
         """
         Train the RBM model using Contrastive Divergence algorithm.
 
@@ -78,11 +81,22 @@ class RBM():
                 self.a = self.a + (lr / tb) * grad_a
                 self.b = self.b + (lr / tb) * grad_b
 
-            diff = abs(v_0 - v_1)
-            mse = np.sum(diff) / diff.shape[0]
-            errors.append(mse)
-            # print(f"Mean Square Error at iteration {k} : ", mse)
+            H = self.entree_sortie(X)
+            X_rec = self.sortie_entree(H)
+            loss = np.mean((X - X_rec)**2) 
+            errors.append(loss)
+            
+            if verbose and k % 10 == 0:
+                print(f"Mean Square Error at iteration {k}: {loss}")
+            
+        if plot:
+            plt.plot(errors)
+            plt.xlabel("Epoch")
+            plt.ylabel("Loss")
+            plt.show()
+
         return errors
+        
 
     def generer_image(self, nb_iter_gibbs, nb_image):
         """
@@ -108,3 +122,6 @@ class RBM():
             generated_images.append(v)
 
         return generated_images
+
+    def count_parameters(self):
+        return self.W.size + self.a.size + self.b.size

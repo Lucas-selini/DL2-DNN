@@ -16,37 +16,30 @@ Returns:
 - None
 """
 
-from utils.dbnv2 import DBN
+from utils.dbn import DBN
 from utils.utils import *
 
-# Chargement des données
-data_sample = [10,11,12,13,14,15,16,17,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35] # 10 = A, B = 11, ..., Z = 35
-data = lire_alpha_digit(data_sample)
+def main():
+    # Chargement des données
+    data_sample = [10,11,12,13,14] # 10 = A, B = 11, ..., Z = 35
+    data = lire_alpha_digit(data_sample)
 
-# Paramètres liés au réseau et à l'apprentissage
-p = data.shape[1] # 20*16 = 320
-q = 200
-learning_rate = 0.05
-batch_size = 10
-nb_iter = 1000
+    # Paramètres liés au réseau et à l'apprentissage
+    p = data.shape[1]
+    q = 200
+    learning_rate = 0.05
+    batch_size = 10
+    nb_iter = 1001
 
-nb_gibbs_iteration = 200
-nb_image_generate = 15
+    nb_gibbs_iteration = 200
+    nb_image_generate = 15
 
-# Entrainement du DBN
-dbn_model = DBN([p,q,q])
-_ = dbn_model.train(data ,learning_rate, batch_size, nb_iter, verbose=True)
+    # Entrainement du DBN
+    dbn_model = DBN([p,q,q])
+    _ = dbn_model.train(data ,learning_rate, batch_size, nb_iter, verbose=True)
 
-# Génération d'images
-display_image(dbn_model.generer_image(nb_gibbs_iteration,nb_image_generate),20,16,save=True)
+    # Génération d'images
+    display_image(dbn_model.generer_image(nb_gibbs_iteration,nb_image_generate),20,16,save=True)
 
-# # Etude de l'influence des différents hyperparamètres
-# learning_rates = [0.1, 0.2]
-# images = []
-
-# for learning_rate in learning_rates:
-#     dbn_model = DBN([p,q,q])
-#     _ = dbn_model.train(data,learning_rate, batch_size, nb_iter, verbose=True)
-#     images.append(dbn_model.generer_image(nb_gibbs_iteration,nb_image_generate))
-
-# display_image(images,20,16,save=True)
+if __name__ == "__main__":
+    main()

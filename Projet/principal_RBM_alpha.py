@@ -16,47 +16,29 @@ Returns:
 - None
 """
 
-from utils.rbmv2 import RBM
+from utils.rbm import RBM
 from utils.utils import *
 
-nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-X_train, _, _, _ = lire_MNIST(nums)
+def main():
+    # Chargement des données
+    data_sample = [10, 11, 12] # 10 = A, B = 11, ..., Z = 35
+    data = lire_alpha_digit(data_sample)
+    p = data.shape[1]
 
+    # Paramètres liés au réseau et à l'apprentissage
+    q = 200
+    learning_rate = 0.05
+    batch_size = 10
+    nb_iter = 1001
+    nb_gibbs_iteration = 200
+    nb_image_generate = 15
 
-# Chargement des données
-# data_sample = [10,11,12,13,14,15] # 10 = A, B = 11, ..., Z = 35
-# data = lire_alpha_digit(data_sample)
-# p = data.shape[1]
+    # Entrainement du DBN
+    rbm_model = RBM(p,q)
+    _ = rbm_model.train(data, learning_rate, batch_size, nb_iter, verbose=True, plot=True)
 
-# Paramètres liés au réseau et à l'apprentissage
-q = 200
-learning_rate = 0.05
-batch_size = 10
-nb_iter = 1000
-nb_gibbs_iteration = 200
-nb_image_generate = 15
-
-
-###### Affichage des données
-# permutation = np.random.permutation(data.shape[0])
-# data_shuffled = data[permutation]
-
-# fig, axes = plt.subplots(1, 15, figsize=(20, 2))
-# for i in range(15):
-#     axes[i].imshow(data_shuffled[i].reshape(20, 16), cmap='gray')
-#     axes[i].axis('off')
-
-# # plt.imshow(data[19].reshape(20, 16), cmap='gray')
-# plt.show()
-
-# data = np.delete(data, 19, axis=0)
-
-
-
-###### Entrainement du RBM
-# Entrainement du DBN
-# rbm_model = RBM(p,q)
-# _ = rbm_model.train(data, learning_rate, batch_size, nb_iter, verbose=True, plot=False)
-
-# # Génération d'images
-# display_image(rbm_model.generer_image(nb_gibbs_iteration,nb_image_generate),20,16,save=True)
+    # Génération d'images
+    display_image(rbm_model.generer_image(nb_gibbs_iteration,nb_image_generate),20,16,save=True)
+    
+if __name__ == "__main__":
+    main()
